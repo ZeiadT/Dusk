@@ -37,8 +37,7 @@ fun DuskApp(navController: NavHostController) {
             DuskBottomNavBar(navController = navController)
         }) { innerPadding ->
         NavigationHost(
-            navController = navController,
-            modifier = Modifier
+            navController = navController, modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         )

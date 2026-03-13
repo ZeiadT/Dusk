@@ -13,6 +13,8 @@ interface LocationRepository {
 
     suspend fun saveLocation(location: Location)
 
+    suspend fun setCurrent(location: Location)
+
     suspend fun setDefaultLocation(lat: Double, lon: Double)
 
     suspend fun deleteLocation(lat: Double, lon: Double)

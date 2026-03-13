@@ -20,6 +20,9 @@ data class LocationEntity(
     @ColumnInfo(name = "is_default")
     val isDefault: Boolean,
 
+    @ColumnInfo(name = "is_current")
+    val isCurrent: Boolean,
+
     @ColumnInfo(name = "city_name")
     val cityName: String,
 

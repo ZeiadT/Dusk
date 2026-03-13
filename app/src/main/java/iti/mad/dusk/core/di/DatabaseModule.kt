@@ -9,6 +9,7 @@ import dagger.hilt.components.SingletonComponent
 import iti.mad.dusk.data.local.DuskDatabase
 import iti.mad.dusk.data.local.dao.ForecastDao
 import iti.mad.dusk.data.local.dao.CurrentWeatherDao
+import iti.mad.dusk.data.local.dao.LocationDao
 import javax.inject.Singleton
 
 @Module
@@ -30,4 +31,10 @@ class DatabaseModule {
     @Singleton
     fun provideForecastCacheDao(duskDatabase: DuskDatabase): ForecastDao =
         duskDatabase.forecastCacheDao()
+
+
+    @Provides
+    @Singleton
+    fun provideLocationDao(duskDatabase: DuskDatabase): LocationDao =
+        duskDatabase.locationDao()
 }

@@ -6,6 +6,7 @@ data class Location(
     val cityName: String,
     val country: String,
     val displayName: String,
-    val isDefault: Boolean,
+    val isDefault: Boolean = false,
+    val isCurrent: Boolean = false,
     val addedAt: Long
 )

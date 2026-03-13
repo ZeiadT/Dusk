@@ -70,4 +70,5 @@ dependencies {
     ksp(libs.room.compiler)
     ksp(libs.hilt.android.compiler)
     implementation(libs.play.services.location)
+    implementation(libs.bundles.coil)
 }

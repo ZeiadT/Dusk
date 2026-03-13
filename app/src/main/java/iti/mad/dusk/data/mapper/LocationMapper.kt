@@ -10,6 +10,7 @@ fun LocationEntity.toDomain(): Location = Location(
     country = country,
     displayName = displayName,
     isDefault = isDefault,
+    isCurrent = isCurrent,
     addedAt = addedAt
 )
 
@@ -21,5 +22,6 @@ fun Location.toEntity(): LocationEntity = LocationEntity(
     country = country,
     displayName = displayName,
     isDefault = isDefault,
+    isCurrent = isCurrent,
     addedAt = addedAt
 )

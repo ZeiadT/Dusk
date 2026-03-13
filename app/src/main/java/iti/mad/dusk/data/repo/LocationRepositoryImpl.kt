@@ -1,5 +1,6 @@
 package iti.mad.dusk.data.repo
 
+import android.util.Log
 import iti.mad.dusk.data.local.datasource.LocationLocalDataSource
 import iti.mad.dusk.data.mapper.toDomain
 import iti.mad.dusk.data.mapper.toEntity
@@ -18,13 +19,22 @@ class LocationRepositoryImpl @Inject constructor(private val locationLocalDataSo
         }
 
     override fun getDefaultLocation(): Flow<Location?> =
-        locationLocalDataSource.getDefaultLocation().map { it?.toDomain() }
+        locationLocalDataSource.getDefaultLocation().map {
+            Log.d("TAG", "getDefaultLocation: $it")
+            it?.toDomain() }
 
     override fun isSaved(lat: Double, lon: Double): Flow<Boolean> =
         locationLocalDataSource.isSaved(lat, lon)
 
     override suspend fun saveLocation(location: Location) =
         locationLocalDataSource.insertLocation(location.toEntity())
+
+    override suspend fun setCurrent(location: Location) {
+
+        Log.d("TAG", "setCurrent: $location")
+        locationLocalDataSource.setCurrentLocation(location.toEntity())
+    }
+
 
     override suspend fun setDefaultLocation(lat: Double, lon: Double) =
         locationLocalDataSource.setDefaultLocation(lat, lon)

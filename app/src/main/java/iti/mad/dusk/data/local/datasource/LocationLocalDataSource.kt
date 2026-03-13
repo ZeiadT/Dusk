@@ -25,6 +25,10 @@ class LocationLocalDataSource @Inject constructor(private val locationDao: Locat
             LocationEntity.locationId(lat.roundCoordinate(), lon.roundCoordinate())
         )
 
+
+    suspend fun setCurrentLocation(entity: LocationEntity) =
+        locationDao.updateCurrentLocation(entity.lat, entity.lon, entity.cityName, entity.country, entity.displayName)
+
     suspend fun deleteLocation(lat: Double, lon: Double) =
         locationDao.deleteLocation(
             LocationEntity.locationId(lat.roundCoordinate(), lon.roundCoordinate())

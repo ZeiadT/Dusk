@@ -21,6 +21,7 @@ class DuskApplication @Inject constructor() : Application() {
             projectId = envProvider.clarityId,
             logLevel = LogLevel.Debug
         )
-        Clarity.initialize(applicationContext, config)
+//        Clarity.initialize(applicationContext, config)
+        //todo remove comment on production
     }
 }

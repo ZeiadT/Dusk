@@ -28,16 +28,16 @@ fun NavigationHost(
         popExitTransition = { fadeOut(animationSpec = tween(200)) }
     ) {
         composable<Screen.Home> {
-            HomeScreen(modifier)
+            HomeScreen()
         }
         composable<Screen.Alert> {
-            AlertScreen(modifier)
+            AlertScreen()
         }
         composable<Screen.Favourite> {
-            FavouriteScreen(modifier)
+            FavouriteScreen()
         }
         composable<Screen.Settings> {
-            SettingScreen(modifier)
+            SettingScreen()
         }
     }
 }

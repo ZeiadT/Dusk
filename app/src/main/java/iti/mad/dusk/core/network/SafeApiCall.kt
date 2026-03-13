@@ -11,7 +11,7 @@ suspend fun <T> safeApiCall(
         Result.success(apiCall())
     } catch (e: HttpException) {
         val error = when (e.code()) {
-            404 -> WeatherException.LocationNotFound()
+            404 -> WeatherException.EndpointNotFound()
             in 500..599 -> WeatherException.ServerError(e.code())
             else -> WeatherException.Unknown(e.message)
         }

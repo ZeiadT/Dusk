@@ -4,7 +4,9 @@ sealed class WeatherException() : Exception() {
 
     class NoNetwork : WeatherException()
 
-    class LocationNotFound : WeatherException()
+    class EndpointNotFound : WeatherException()
+
+    class LocationUnavailable(override val message: String? = null) : WeatherException()
 
     class ServerError(val code: Int) : WeatherException()
 
