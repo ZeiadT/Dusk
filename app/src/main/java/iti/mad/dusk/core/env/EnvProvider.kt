@@ -26,12 +26,19 @@ class EnvProvider @Inject constructor() {
                         "Please add: CLARITY_ID=your_id_here"
             )
 
+    val mabBoxToken: String
+        get() = dotenv["MAPBOX_TOKEN"]
+            ?: throw IllegalStateException(
+                "CLARITY_ID not found in assets/env. " +
+                        "Please add: CLARITY_ID=your_id_here"
+            )
+
     init {
         validateRequiredKeys()
     }
 
     private fun validateRequiredKeys() {
-        val requiredKeys = listOf("OWM_API_KEY", "CLARITY_ID")
+        val requiredKeys = listOf("OWM_API_KEY", "CLARITY_ID", "MAPBOX_TOKEN")
         val missingKeys = requiredKeys.filter { dotenv[it] == null }
 
         if (missingKeys.isNotEmpty()) {

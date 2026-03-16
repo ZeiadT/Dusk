@@ -9,8 +9,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import iti.mad.dusk.ui.presentation.alert.AlertScreen
-import iti.mad.dusk.ui.presentation.favourite.FavouriteScreen
+import iti.mad.dusk.ui.presentation.locations.LocationsScreen
 import iti.mad.dusk.ui.presentation.home.HomeScreen
+import iti.mad.dusk.ui.presentation.map.MapScreen
 import iti.mad.dusk.ui.presentation.setting.SettingScreen
 
 @Composable
@@ -33,11 +34,14 @@ fun NavigationHost(
         composable<Screen.Alert> {
             AlertScreen()
         }
-        composable<Screen.Favourite> {
-            FavouriteScreen()
+        composable<Screen.Locations> {
+            LocationsScreen { navController.navigate(Screen.Map) }
         }
         composable<Screen.Settings> {
             SettingScreen()
+        }
+        composable<Screen.Map> {
+            MapScreen() { navController.popBackStack() }
         }
     }
 }

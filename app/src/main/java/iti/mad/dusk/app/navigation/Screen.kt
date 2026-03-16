@@ -21,7 +21,10 @@ sealed class Screen {
     data object Alert : Screen()
 
     @Serializable
-    data object Favourite : Screen()
+    data object Locations : Screen()
+
+    @Serializable
+    data object Map : Screen()
 
     @Serializable
     data object Settings : Screen()
@@ -52,7 +55,7 @@ val bottomNavItems = listOf(
         unselectedIcon = Icons.Outlined.Cloud
     ),
     BottomNavItem(
-        screen = Screen.Favourite,
+        screen = Screen.Locations,
         label = "Favourites",
         selectedIcon = Icons.Filled.Map,
         unselectedIcon = Icons.Outlined.Map

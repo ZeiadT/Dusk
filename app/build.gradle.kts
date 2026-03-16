@@ -71,4 +71,18 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     implementation(libs.play.services.location)
     implementation(libs.bundles.coil)
+
+    implementation(libs.mapbox)
+
+    implementation(libs.mapbox.compose) {
+        exclude(group = "com.mapbox.common", module = "common")
+    }
+
+    implementation(libs.mapbox.search) {
+        exclude(group = "com.mapbox.common", module = "common")
+    }
+
+    implementation(libs.mapbox.search.ui) {
+        exclude(group = "com.mapbox.common", module = "common")
+    }
 }

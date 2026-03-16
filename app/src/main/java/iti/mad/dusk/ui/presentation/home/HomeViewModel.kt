@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import iti.mad.dusk.core.base.Resource
 import iti.mad.dusk.core.util.extension.combine
+import iti.mad.dusk.core.util.extension.roundCoordinate
 import iti.mad.dusk.domain.exception.WeatherException
 import iti.mad.dusk.domain.model.CurrentWeather
 import iti.mad.dusk.domain.model.Forecast
@@ -33,9 +34,18 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     private var weatherJob: Job? = null
-
-    // Last known resolved location — set whenever init collector fires
     private var lastKnownLocation: Pair<Double, Double>? = null
+        set(value) {
+            if(value == null) {
+                field = null
+                return
+            }
+
+            val lat = value.first.roundCoordinate()
+            val lon = value.second.roundCoordinate()
+
+            field = lat to lon
+        }
 
     private val _currentWeatherState = MutableStateFlow<CurrentWeather?>(null)
     private val _forecastState = MutableStateFlow<Forecast?>(null)
@@ -74,28 +84,34 @@ class HomeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             locationRepository.getDefaultLocation().collect { location ->
-                if (location != null && location.lat == lastKnownLocation?.first && location.lon == lastKnownLocation?.second){
-                    fetchAndUpdateUI(location.lat, location.lon, forceFresh = false)
+                Log.d("TAG", "Default Location: $location")
+
+                if (location == null || location.isCurrent) {
+                    Log.d("TAG", "Location is null or current")
+                    if (location != null && lastKnownLocation != null && (location.lat == lastKnownLocation?.first && location.lon == lastKnownLocation?.second)) {
+                        Log.d("TAG", "Current location found")
+                        fetchAndUpdateUI(location.lat, location.lon, forceFresh = false)
+                        return@collect
+                    }
+
+                    Log.d("TAG", "Requesting permission")
+                    if(location != null) lastKnownLocation = location.lat to location.lon
+                    _locationEvents.send(LocationEvent.RequestPermissions)
                     return@collect
                 }
 
-                if (location != null && location.isCurrent.not()) {
-                    Log.d("TAG", "in collect: if")
-                    lastKnownLocation = location.lat to location.lon
-                    fetchAndUpdateUI(location.lat, location.lon, forceFresh = false)
-                } else {
-                    Log.d("TAG", "in collect: else")
-                    _locationEvents.send(LocationEvent.RequestPermissions)
-                }
+                Log.d("TAG", "Location is not null nor current")
+                lastKnownLocation = location.lat to location.lon
+                fetchAndUpdateUI(location.lat, location.lon, forceFresh = false)
             }
         }
     }
 
-    fun getWeather(forceFresh: Boolean = false) {
+    fun refreshWeather() {
         Log.d("TAG", "in getWeather")
         val location = lastKnownLocation
         if (location != null) {
-            fetchAndUpdateUI(location.first, location.second, forceFresh)
+            fetchAndUpdateUI(location.first, location.second, true)
         }
     }
 
@@ -136,9 +152,14 @@ class HomeViewModel @Inject constructor(
                 )
                 lastKnownLocation = location.lat to location.lon
                 locationRepository.setCurrent(location)
+
+                Log.d("TAG", "saveCurrentLocationAndUpdateUI: ${result.lat} -- ${result.lon}")
             }
 
             is LocationManager.LocationResult.Failure -> {
+                Log.d("TAG", "saveCurrentLocationAndUpdateUI: ${result.exception}")
+                lastKnownLocation?.let { fetchAndUpdateUI(it.first, it.second, forceFresh = false) }
+
                 _weatherException.emit(result.exception)
                 _forecastException.emit(result.exception)
                 _isInitialized.emit(true)
@@ -160,6 +181,7 @@ class HomeViewModel @Inject constructor(
             when (resource) {
                 is Resource.Loading -> _weatherLoading.emit(true)
                 is Resource.Success -> {
+                    Log.d("TAG", "in fetchCurrentWeather ${resource.data}")
                     _currentWeatherState.emit(resource.data)
                     _weatherException.emit(null)
                     _weatherLoading.emit(false)

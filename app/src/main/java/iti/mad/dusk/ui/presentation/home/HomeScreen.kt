@@ -1,6 +1,5 @@
 package iti.mad.dusk.ui.presentation.home
 
-import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -61,7 +60,7 @@ import iti.mad.dusk.ui.util.ObserveAsEvents
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    homeViewModel: HomeViewModel = hiltViewModel()
+    homeViewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
     var bannerHeightPx by remember { mutableIntStateOf(0) }
@@ -111,7 +110,7 @@ fun HomeScreen(
                     message = (uiState.weatherException ?: uiState.forecastException)
                         ?.message ?: "Something went wrong",
                     icon = Icons.Outlined.WifiOff,
-                    onRetry = { homeViewModel.getWeather(forceFresh = true) }
+                    onRetry = { homeViewModel.refreshWeather() }
                 )
             }
 
@@ -120,7 +119,7 @@ fun HomeScreen(
             else -> {
                 DataScreen(
                     uiState = uiState,
-                    onRefresh = { homeViewModel.getWeather(forceFresh = true) },
+                    onRefresh = { homeViewModel.refreshWeather() },
                     bannerHeightPx = bannerHeightPx
                 )
             }
@@ -152,12 +151,12 @@ fun HomeScreen(
             ErrorBanner(
                 message = uiState.weatherException
                     ?.takeIf { uiState.currentWeather != null }?.message,
-                onRetry = { homeViewModel.getWeather(forceFresh = true) }
+                onRetry = { homeViewModel.refreshWeather() }
             )
             ErrorBanner(
                 message = uiState.forecastException
                     ?.takeIf { uiState.forecast != null }?.message,
-                onRetry = { homeViewModel.getWeather(forceFresh = true) }
+                onRetry = { homeViewModel.refreshWeather() }
             )
         }
     }

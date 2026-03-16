@@ -76,7 +76,7 @@ class LocationManager @Inject constructor(@param:ApplicationContext private val 
     @SuppressLint("MissingPermission")
     suspend fun getCurrentLocation(): LocationResult = suspendCancellableCoroutine { cont ->
         val request = CurrentLocationRequest.Builder().setPriority(Priority.PRIORITY_HIGH_ACCURACY)
-            .setDurationMillis(10_000L).setMaxUpdateAgeMillis(60_000L).build()
+            .setDurationMillis(10_000L).setMaxUpdateAgeMillis(Long.MAX_VALUE).build()
 
         fusedLocationClient.getCurrentLocation(request, null).addOnSuccessListener { location ->
                 if (location != null) cont.resume(

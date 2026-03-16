@@ -11,6 +11,9 @@ interface LocationRepository {
 
     fun isSaved(lat: Double, lon: Double): Flow<Boolean>
 
+    suspend fun isDefault(lat: Double, lon: Double): Boolean
+    suspend fun isCurrent(lat: Double, lon: Double): Boolean
+
     suspend fun saveLocation(location: Location)
 
     suspend fun setCurrent(location: Location)

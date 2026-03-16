@@ -21,10 +21,18 @@ class LocationRepositoryImpl @Inject constructor(private val locationLocalDataSo
     override fun getDefaultLocation(): Flow<Location?> =
         locationLocalDataSource.getDefaultLocation().map {
             Log.d("TAG", "getDefaultLocation: $it")
-            it?.toDomain() }
+            it?.toDomain()
+        }
 
     override fun isSaved(lat: Double, lon: Double): Flow<Boolean> =
         locationLocalDataSource.isSaved(lat, lon)
+
+    override suspend fun isDefault(lat: Double, lon: Double): Boolean =
+        locationLocalDataSource.isDefaultLocation(lat, lon)
+
+    override suspend fun isCurrent(lat: Double, lon: Double): Boolean =
+        locationLocalDataSource.isCurrentLocation(lat, lon)
+
 
     override suspend fun saveLocation(location: Location) =
         locationLocalDataSource.insertLocation(location.toEntity())
