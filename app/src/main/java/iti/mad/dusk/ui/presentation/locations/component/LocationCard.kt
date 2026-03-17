@@ -24,6 +24,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import iti.mad.dusk.R
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -89,12 +91,12 @@ fun LocationCard(
                     Spacer(Modifier.height(6.dp))
                     Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         if (isCurrent) LocationBadge(
-                            label = "Current",
+                            label = stringResource(R.string.locations_badge_current),
                             MaterialTheme.colorScheme.primaryContainer,
                             MaterialTheme.colorScheme.onPrimaryContainer
                         )
                         if (isDefault) LocationBadge(
-                            label = "Default",
+                            label = stringResource(R.string.locations_badge_default),
                             MaterialTheme.colorScheme.secondaryContainer,
                             MaterialTheme.colorScheme.onSecondaryContainer
                         )
@@ -105,12 +107,12 @@ fun LocationCard(
             Box {
                 IconButton(onClick = { menuExpanded = true }) {
                     Icon(
-                        imageVector = Icons.Outlined.MoreVert, contentDescription = "Options"
+                        imageVector = Icons.Outlined.MoreVert, contentDescription = stringResource(R.string.locations_menu_options)
                     )
                 }
                 DropdownMenu(
                     expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
-                    if(isDefault.not()) DropdownMenuItem(text = { Text("Set as default") }, leadingIcon = {
+                    if(isDefault.not()) DropdownMenuItem(text = { Text(stringResource(R.string.locations_menu_set_default)) }, leadingIcon = {
                         Icon(Icons.Outlined.Bookmarks, contentDescription = null)
                     }, onClick = {
                         menuExpanded = false
@@ -118,7 +120,7 @@ fun LocationCard(
                     })
                     if(isDefault.not()) HorizontalDivider()
                     DropdownMenuItem(text = {
-                        Text("Delete", color = MaterialTheme.colorScheme.error)
+                        Text(stringResource(R.string.locations_menu_delete), color = MaterialTheme.colorScheme.error)
                     }, leadingIcon = {
                         Icon(
                             Icons.Outlined.Delete,

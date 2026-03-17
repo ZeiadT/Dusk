@@ -3,6 +3,7 @@ package iti.mad.dusk.ui.presentation.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import iti.mad.dusk.app.navigation.Screen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -30,5 +31,9 @@ class MainViewModel @Inject constructor() : ViewModel() {
 
     fun setBottomBar(show: Boolean) {
         _bottomBarState.value = show
+    }
+
+    fun onHomeNavigation(){
+        setFab(null)
     }
 }

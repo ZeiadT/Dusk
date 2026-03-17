@@ -29,6 +29,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import iti.mad.dusk.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -57,7 +59,7 @@ fun MapSearchBar(
             TextField(
                 value = searchState.query,
                 onValueChange = { onEvent(MapEvent.OnQueryChanged(it)) },
-                placeholder = { Text("Search location…") },
+                placeholder = { Text(stringResource(R.string.map_search_placeholder)) },
                 leadingIcon = {
                     if (searchState.isSearching) {
                         CircularProgressIndicator(
@@ -78,7 +80,7 @@ fun MapSearchBar(
                             onEvent(MapEvent.ClearSearch)
                             focusManager.clearFocus()
                         }) {
-                            Icon(Icons.Outlined.Clear, contentDescription = "Clear")
+                            Icon(Icons.Outlined.Clear, contentDescription = stringResource(R.string.map_search_clear))
                         }
                     }
                 },

@@ -1,4 +1,4 @@
-package iti.mad.dusk.ui.components
+package iti.mad.dusk.ui.presentation.home.component
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
@@ -13,6 +13,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import iti.mad.dusk.R
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,13 +42,13 @@ fun ForecastToggle(
             val isSelected = selected == tab
             val bgColor by animateColorAsState(
                 targetValue = if (isSelected) MaterialTheme.colorScheme.primary
-                              else MaterialTheme.colorScheme.surfaceVariant,
+                else MaterialTheme.colorScheme.surfaceVariant,
                 animationSpec = tween(200),
                 label = "tabBg"
             )
             val textColor by animateColorAsState(
                 targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimary
-                              else MaterialTheme.colorScheme.onSurfaceVariant,
+                else MaterialTheme.colorScheme.onSurfaceVariant,
                 animationSpec = tween(200),
                 label = "tabText"
             )
@@ -61,8 +63,8 @@ fun ForecastToggle(
             ) {
                 Text(
                     text = when (tab) {
-                        ForecastTab.HOURLY -> "Hourly"
-                        ForecastTab.DAILY  -> "5-Day"
+                        ForecastTab.HOURLY -> stringResource(R.string.home_tab_hourly)
+                        ForecastTab.DAILY  -> stringResource(R.string.home_tab_5day)
                     },
                     color      = textColor,
                     fontSize   = 13.sp,

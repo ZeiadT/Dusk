@@ -1,8 +1,9 @@
 package iti.mad.dusk.app
 
 import android.app.Application
+import androidx.hilt.work.HiltWorkerFactory
+import androidx.work.Configuration
 import com.mapbox.common.MapboxOptions
-import com.mapbox.maps.plugin.Plugin
 import com.microsoft.clarity.Clarity
 import com.microsoft.clarity.ClarityConfig
 import com.microsoft.clarity.models.LogLevel
@@ -11,10 +12,18 @@ import iti.mad.dusk.core.env.EnvProvider
 import javax.inject.Inject
 
 @HiltAndroidApp
-class DuskApplication : Application() {
+class DuskApplication : Application(), Configuration.Provider {
 
     @Inject
     lateinit var envProvider: EnvProvider
+
+    @Inject
+    lateinit var workerFactory: HiltWorkerFactory
+
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
+            .setWorkerFactory(workerFactory)
+            .build()
 
     override fun onCreate() {
         super.onCreate()
@@ -25,8 +34,6 @@ class DuskApplication : Application() {
             projectId = envProvider.clarityId,
             logLevel = LogLevel.Debug
         )
-
-        //Clarity.initialize(applicationContext, config)
-        //todo remove comment on production
+        Clarity.initialize(applicationContext, config)
     }
 }

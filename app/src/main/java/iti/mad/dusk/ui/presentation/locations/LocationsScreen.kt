@@ -1,5 +1,6 @@
 package iti.mad.dusk.ui.presentation.locations
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +16,8 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import iti.mad.dusk.R
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,8 +32,10 @@ import iti.mad.dusk.ui.presentation.locations.model.SnackBarEvent
 import iti.mad.dusk.ui.presentation.main.FabState
 import iti.mad.dusk.ui.presentation.main.LocalSnackbarHostState
 import iti.mad.dusk.ui.presentation.main.MainViewModel
+import androidx.compose.ui.platform.LocalContext
 import iti.mad.dusk.ui.util.ObserveAsEvents
 
+@SuppressLint("LocalContextGetResourceValueCall")
 @Composable
 fun LocationsScreen(
     modifier: Modifier = Modifier,
@@ -41,36 +46,39 @@ fun LocationsScreen(
 
     val locations by locationsViewModel.locationsState.collectAsStateWithLifecycle()
     val snackbarHostState = LocalSnackbarHostState.current
+    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         mainViewModel.setFab(
             FabState(
                 icon = Icons.Outlined.Add,
-                label = "Add location",
+                label = context.getString(R.string.locations_fab_add),
                 onClick = navigateToMap
             )
         )
-    }
-
-    DisposableEffect(Unit) {
-        onDispose { mainViewModel.setFab(null) }
+        mainViewModel.setBottomBar(true)
     }
 
     ObserveAsEvents(locationsViewModel.events) { event ->
         when (event) {
             is SnackBarEvent.LocationRemoved -> snackbarHostState.showSnackbar(
-                message = "Location Removed Successfully", duration = SnackbarDuration.Short
+                message = context.getString(R.string.locations_snack_removed),
+                duration = SnackbarDuration.Short
             )
 
             is SnackBarEvent.LocationAlreadyDefault -> snackbarHostState.showSnackbar(
-                message = "This location is already default", duration = SnackbarDuration.Short
+                message = context.getString(R.string.locations_snack_already_default),
+                duration = SnackbarDuration.Short
             )
 
             is SnackBarEvent.DeleteDefaultNotSupported -> snackbarHostState.showSnackbar(
-                message = "Can't delete default location", duration = SnackbarDuration.Short
+                message = context.getString(R.string.locations_snack_cant_delete_default),
+                duration = SnackbarDuration.Short
             )
+
             is SnackBarEvent.DeleteCurrentNotSupported -> snackbarHostState.showSnackbar(
-                message = "Can't delete current location", duration = SnackbarDuration.Short
+                message = context.getString(R.string.locations_snack_cant_delete_current),
+                duration = SnackbarDuration.Short
             )
         }
     }
@@ -81,7 +89,7 @@ fun LocationsScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("No saved locations yet")
+            Text(stringResource(R.string.locations_empty))
         }
     } else {
         LazyColumn(
@@ -92,9 +100,7 @@ fun LocationsScreen(
         ) {
             item { Spacer(Modifier.height(4.dp)) }
             items(
-                items = locations,
-                key = { it.lat.toString() + it.lon.toString() }
-            ) { location ->
+                items = locations, key = { it.lat.toString() + it.lon.toString() }) { location ->
                 LocationCard(
                     cityName = location.cityName,
                     country = location.country,

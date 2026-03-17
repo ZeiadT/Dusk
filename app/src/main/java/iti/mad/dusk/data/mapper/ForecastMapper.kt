@@ -1,5 +1,6 @@
 package iti.mad.dusk.data.mapper
 
+import iti.mad.dusk.core.util.UnitConverter
 import iti.mad.dusk.core.util.extension.roundCoordinate
 import iti.mad.dusk.data.local.entity.ForecastCacheEntity
 import iti.mad.dusk.data.local.entity.ForecastItemEntity
@@ -15,6 +16,7 @@ import iti.mad.dusk.domain.model.ForecastItem
 import iti.mad.dusk.domain.model.Precipitation
 import iti.mad.dusk.domain.model.Temperature
 import iti.mad.dusk.domain.model.WeatherCondition
+import iti.mad.dusk.domain.model.WeatherSettings
 import iti.mad.dusk.domain.model.Wind
 
 // ── DTO → Entity ──────────────────────────────────────────────────────────────
@@ -98,8 +100,11 @@ private fun ForecastItemDto.toItemEntity(locationId: String): ForecastItemEntity
 
 // ── Entity → Domain ───────────────────────────────────────────────────────────
 
-fun ForecastCacheEntity.toDomain(items: List<ForecastItemWithConditions>): Forecast {
-    val forecastItems = items.map { it.toDomain() }
+fun ForecastCacheEntity.toDomain(
+    items: List<ForecastItemWithConditions>,
+    weatherSettings: WeatherSettings
+): Forecast {
+    val forecastItems = items.map { it.toDomain(weatherSettings) }
     return Forecast(
         latitude = lat,
         longitude = lon,
@@ -117,7 +122,7 @@ fun ForecastCacheEntity.toDomain(items: List<ForecastItemWithConditions>): Forec
     )
 }
 
-private fun ForecastItemWithConditions.toDomain(): ForecastItem {
+private fun ForecastItemWithConditions.toDomain(weatherSettings: WeatherSettings): ForecastItem {
     val primary = conditions.firstOrNull()
     return ForecastItem(
         timestamp = item.dt,
@@ -133,24 +138,24 @@ private fun ForecastItemWithConditions.toDomain(): ForecastItem {
             icon = primary?.icon ?: "01d"
         ),
         temperature = Temperature(
-            current = item.temp ?: 0f,
-            feelsLike = item.feelsLike ?: 0f,
-            min = item.tempMin ?: 0f,
-            max = item.tempMax ?: 0f,
-            pressure = item.pressure ?: 1013,
-            humidity = item.humidity ?: 0
+            current   = UnitConverter.convertTemperature(item.temp      ?: 0f, weatherSettings.temperatureUnit),
+            feelsLike = UnitConverter.convertTemperature(item.feelsLike ?: 0f, weatherSettings.temperatureUnit),
+            min       = UnitConverter.convertTemperature(item.tempMin   ?: 0f, weatherSettings.temperatureUnit),
+            max       = UnitConverter.convertTemperature(item.tempMax   ?: 0f, weatherSettings.temperatureUnit),
+            pressure  = item.pressure ?: 1013,
+            humidity  = item.humidity ?: 0
         ),
         wind = Wind(
-            speed = item.windSpeed ?: 0f,
+            speed   = UnitConverter.convertWindSpeed(item.windSpeed ?: 0f, weatherSettings.windSpeedUnit),
             degrees = item.windDeg ?: 0,
-            gust = item.windGust ?: 0f
+            gust    = UnitConverter.convertWindSpeed(item.windGust ?: 0f, weatherSettings.windSpeedUnit),
         ),
         rain = Precipitation(
-            oneHour = item.rain1h ?: 0f,
+            oneHour   = item.rain1h ?: 0f,
             threeHour = item.rain3h ?: 0f
         ),
         snow = Precipitation(
-            oneHour = item.snow1h ?: 0f,
+            oneHour   = item.snow1h ?: 0f,
             threeHour = item.snow3h ?: 0f
         )
     )

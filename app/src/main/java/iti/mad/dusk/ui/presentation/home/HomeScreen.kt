@@ -33,6 +33,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import iti.mad.dusk.domain.exception.toReadableMessage
+import iti.mad.dusk.R
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -47,22 +51,29 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import iti.mad.dusk.ui.components.ForecastTab
-import iti.mad.dusk.ui.components.ForecastToggle
+import iti.mad.dusk.ui.presentation.home.component.ForecastTab
+import iti.mad.dusk.ui.presentation.home.component.ForecastToggle
 import iti.mad.dusk.ui.util.LocationManager
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import iti.mad.dusk.ui.presentation.home.component.CurrentWeatherHeader
+import iti.mad.dusk.ui.presentation.home.component.DailyForecastCard
 import iti.mad.dusk.ui.presentation.home.component.ErrorBanner
+import iti.mad.dusk.ui.presentation.home.component.HomeScreenShimmer
+import iti.mad.dusk.ui.presentation.home.component.HourlyStrip
 import iti.mad.dusk.ui.presentation.home.component.SectionSkeleton
 import iti.mad.dusk.ui.presentation.home.model.HomeUiState
 import iti.mad.dusk.ui.presentation.home.model.LocationEvent
+import iti.mad.dusk.ui.presentation.main.MainViewModel
 import iti.mad.dusk.ui.util.ObserveAsEvents
 
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    homeViewModel: HomeViewModel = hiltViewModel(),
 ) {
+    val homeViewModel: HomeViewModel = hiltViewModel()
+
     val uiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     var bannerHeightPx by remember { mutableIntStateOf(0) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -80,12 +91,11 @@ fun HomeScreen(
 
     ObserveAsEvents(homeViewModel.locationEvents) { event ->
         when (event) {
-            is LocationEvent.RequestPermissions ->
-                permissionLauncher.launch(LocationManager.permissions)
-            is LocationEvent.RequestGpsResolution ->
-                gpsResolutionLauncher.launch(
-                    IntentSenderRequest.Builder(event.exception.resolution).build()
-                )
+            is LocationEvent.RequestPermissions -> permissionLauncher.launch(LocationManager.permissions)
+
+            is LocationEvent.RequestGpsResolution -> gpsResolutionLauncher.launch(
+                IntentSenderRequest.Builder(event.exception.resolution).build()
+            )
         }
     }
 
@@ -103,19 +113,16 @@ fun HomeScreen(
             }
 
             // Initialized but no data arrived and at least one error — full screen error
-            uiState.currentWeather == null &&
-                    uiState.forecast == null &&
-                    (uiState.weatherException != null || uiState.forecastException != null) -> {
+            uiState.currentWeather == null && uiState.forecast == null && (uiState.weatherException != null || uiState.forecastException != null) -> {
                 FullScreenError(
                     message = (uiState.weatherException ?: uiState.forecastException)
-                        ?.message ?: "Something went wrong",
+                        ?.toReadableMessage(context)
+                        ?: stringResource(R.string.home_error_fallback),
                     icon = Icons.Outlined.WifiOff,
-                    onRetry = { homeViewModel.refreshWeather() }
-                )
+                    onRetry = { homeViewModel.refreshWeather() })
             }
 
             // At least partial data — show data screen
-            // per-section failures are shown as banners
             else -> {
                 DataScreen(
                     uiState = uiState,
@@ -146,18 +153,13 @@ fun HomeScreen(
             modifier = Modifier
                 .align(Alignment.TopCenter)
                 .statusBarsPadding()
-                .onGloballyPositioned { bannerHeightPx = it.size.height }
-        ) {
+                .onGloballyPositioned { bannerHeightPx = it.size.height }) {
             ErrorBanner(
-                message = uiState.weatherException
-                    ?.takeIf { uiState.currentWeather != null }?.message,
-                onRetry = { homeViewModel.refreshWeather() }
-            )
+                message = uiState.weatherException?.takeIf { uiState.currentWeather != null }?.toReadableMessage(context),
+                onRetry = { homeViewModel.refreshWeather() })
             ErrorBanner(
-                message = uiState.forecastException
-                    ?.takeIf { uiState.forecast != null }?.message,
-                onRetry = { homeViewModel.refreshWeather() }
-            )
+                message = uiState.forecastException?.takeIf { uiState.forecast != null }?.toReadableMessage(context),
+                onRetry = { homeViewModel.refreshWeather() })
         }
     }
 }
@@ -191,10 +193,10 @@ private fun DataScreen(
 
             when (val w = uiState.currentWeather) {
                 null -> SectionSkeleton(
-                    height = 260.dp,
-                    modifier = Modifier.padding(horizontal = 20.dp)
+                    height = 260.dp, modifier = Modifier.padding(horizontal = 20.dp)
                 )
-                else -> CurrentWeatherHeader(weather = w)
+
+                else -> CurrentWeatherHeader(weather = w, settings = uiState.settings)
             }
 
             Column(modifier = Modifier.padding(horizontal = 20.dp)) {
@@ -210,19 +212,22 @@ private fun DataScreen(
                 when (val f = uiState.forecast) {
                     null -> SectionSkeleton(height = 160.dp)
                     else -> AnimatedContent(
-                        targetState = selectedTab,
-                        transitionSpec = {
+                        targetState = selectedTab, transitionSpec = {
                             val toRight = targetState == ForecastTab.DAILY
-                            (slideInHorizontally(tween(260)) { if (toRight) it else -it } +
-                                    fadeIn(tween(260))) togetherWith
-                                    (slideOutHorizontally(tween(260)) { if (toRight) -it else it } +
-                                            fadeOut(tween(200)))
-                        },
-                        label = "forecastTab"
+                            (slideInHorizontally(tween(260)) { if (toRight) it else -it } + fadeIn(
+                                tween(260)
+                            )) togetherWith (slideOutHorizontally(tween(260)) { if (toRight) -it else it } + fadeOut(
+                                tween(200)
+                            ))
+                        }, label = "forecastTab"
                     ) { tab ->
                         when (tab) {
-                            ForecastTab.HOURLY -> HourlyStrip(items = f.hourly.take(12))
-                            ForecastTab.DAILY -> DailyForecastCard(daily = f.daily)
+                            ForecastTab.HOURLY -> HourlyStrip(
+                                items = f.hourly.take(12)
+                            )
+                            ForecastTab.DAILY -> DailyForecastCard(
+                                daily = f.daily
+                            )
                         }
                     }
                 }
@@ -235,9 +240,7 @@ private fun DataScreen(
 
 @Composable
 private fun FullScreenError(
-    message: String,
-    icon: ImageVector,
-    onRetry: () -> Unit
+    message: String, icon: ImageVector, onRetry: () -> Unit
 ) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         Column(
@@ -257,7 +260,7 @@ private fun FullScreenError(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
             )
-            Button(onClick = onRetry) { Text("Try again") }
+            Button(onClick = onRetry) { Text(stringResource(R.string.home_try_again)) }
         }
     }
 }

@@ -1,4 +1,4 @@
-package iti.mad.dusk.ui.presentation.home
+package iti.mad.dusk.ui.presentation.home.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,20 +21,24 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import iti.mad.dusk.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import iti.mad.dusk.core.util.UnitConverter
 import iti.mad.dusk.domain.model.CurrentWeather
-import iti.mad.dusk.ui.components.RefreshChip
+import iti.mad.dusk.domain.model.WeatherSettings
 import kotlin.math.roundToInt
 
 @Composable
 fun CurrentWeatherHeader(
+    modifier: Modifier = Modifier,
     weather: CurrentWeather,
-    modifier: Modifier = Modifier
+    settings: WeatherSettings,
 ) {
     Column(
         modifier = modifier
@@ -56,7 +60,7 @@ fun CurrentWeatherHeader(
                 )
                 Spacer(Modifier.width(4.dp))
                 Text(
-                    text  = "${weather.cityName}, ${weather.country}",
+                    text  = stringResource(R.string.home_location_format, weather.cityName, weather.country),
                     style = MaterialTheme.typography.labelLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -76,7 +80,7 @@ fun CurrentWeatherHeader(
                 lineHeight = 88.sp
             )
             Text(
-                text       = "°",
+                text       = stringResource(R.string.home_degree_symbol),
                 fontSize   = 44.sp,
                 fontWeight = FontWeight.Light,
                 color      = MaterialTheme.colorScheme.primary,
@@ -102,17 +106,17 @@ fun CurrentWeatherHeader(
                 modifier = Modifier.size(14.dp)
             )
             Spacer(Modifier.width(4.dp))
-            Text("H: ", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp)
+            Text(stringResource(R.string.home_hi_label), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp)
             Text(
-                "${weather.temperature.max.roundToInt()}°",
+                stringResource(R.string.home_temp_format, weather.temperature.max.roundToInt()),
                 color      = MaterialTheme.colorScheme.primary,
                 fontSize   = 13.sp,
                 fontWeight = FontWeight.SemiBold
             )
-            Text("  ·  ", color = MaterialTheme.colorScheme.outline, fontSize = 13.sp)
-            Text("L: ", color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp)
+            Text(stringResource(R.string.home_hi_lo_separator), color = MaterialTheme.colorScheme.outline, fontSize = 13.sp)
+            Text(stringResource(R.string.home_lo_label), color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 13.sp)
             Text(
-                "${weather.temperature.min.roundToInt()}°",
+                stringResource(R.string.home_temp_format, weather.temperature.min.roundToInt()),
                 color      = MaterialTheme.colorScheme.secondary,
                 fontSize   = 13.sp,
                 fontWeight = FontWeight.SemiBold
@@ -130,28 +134,28 @@ fun CurrentWeatherHeader(
         ) {
             WeatherStatItem(
                 icon  = Icons.Outlined.Thermostat,
-                label = "Feels like",
-                value = "${weather.temperature.feelsLike.roundToInt()}°"
+                label = stringResource(R.string.home_stat_feels_like),
+                value = stringResource(R.string.home_temp_format, weather.temperature.feelsLike.roundToInt())
             )
             WeatherStatItem(
                 icon  = Icons.Outlined.WaterDrop,
-                label = "Humidity",
-                value = "${weather.temperature.humidity}%"
+                label = stringResource(R.string.home_stat_humidity),
+                value = stringResource(R.string.home_percent_format, weather.temperature.humidity)
             )
             WeatherStatItem(
                 icon  = Icons.Outlined.Air,
-                label = "Wind",
-                value = "${weather.wind.speed.roundToInt()} m/s"
+                label = stringResource(R.string.home_stat_wind),
+                value = stringResource(R.string.home_wind_format, weather.wind.speed.roundToInt(), UnitConverter.windSpeedSymbol(settings.windSpeedUnit))
             )
             WeatherStatItem(
                 icon  = Icons.Outlined.Compress,
-                label = "Pressure",
-                value = "${weather.temperature.pressure} hPa"
+                label = stringResource(R.string.home_stat_pressure),
+                value = stringResource(R.string.home_pressure_format, weather.temperature.pressure)
             )
             WeatherStatItem(
                 icon  = Icons.Outlined.Visibility,
-                label = "Visibility",
-                value = "${weather.cloudsInPercentage}%"
+                label = stringResource(R.string.home_stat_visibility),
+                value = stringResource(R.string.home_percent_format, weather.cloudsInPercentage)
             )
         }
 

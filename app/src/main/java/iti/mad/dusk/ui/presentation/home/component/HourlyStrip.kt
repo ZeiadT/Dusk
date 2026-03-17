@@ -1,4 +1,4 @@
-package iti.mad.dusk.ui.presentation.home
+package iti.mad.dusk.ui.presentation.home.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +15,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import iti.mad.dusk.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import iti.mad.dusk.domain.model.ForecastItem
+import iti.mad.dusk.domain.model.WeatherSettings
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -30,8 +33,8 @@ import kotlin.math.roundToInt
 
 @Composable
 fun HourlyStrip(
+    modifier: Modifier = Modifier,
     items: List<ForecastItem>,
-    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
@@ -41,7 +44,7 @@ fun HourlyStrip(
             .padding(vertical = 16.dp)
     ) {
         Text(
-            "HOURLY",
+            stringResource(R.string.home_section_hourly),
             style    = MaterialTheme.typography.labelSmall,
             color    = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = 20.dp)
@@ -66,7 +69,7 @@ private fun HourlyItemCell(item: ForecastItem) {
 
     val isDay    = item.isDay
     val accent   = if (isDay) MaterialTheme.colorScheme.primary
-                   else MaterialTheme.colorScheme.secondary
+    else MaterialTheme.colorScheme.secondary
     val bgColor  = accent.copy(alpha = 0.12f)
 
     Column(
@@ -86,14 +89,14 @@ private fun HourlyItemCell(item: ForecastItem) {
             fontSize  = 10.sp
         )
         Text(
-            "${item.temperature.current.roundToInt()}°",
+            stringResource(R.string.home_temp_format, item.temperature.current.roundToInt()),
             color      = accent,
             fontSize   = 15.sp,
             fontWeight = FontWeight.SemiBold
         )
         if (item.precipitationProbability > 0.1f) {
             Text(
-                "${(item.precipitationProbability * 100).roundToInt()}%",
+                stringResource(R.string.home_percent_format, (item.precipitationProbability * 100).roundToInt()),
                 color    = MaterialTheme.colorScheme.secondary,
                 fontSize = 9.sp
             )

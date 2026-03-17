@@ -49,6 +49,10 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.hilt.common)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.hilt.work)
+    implementation(libs.core.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -69,20 +73,23 @@ dependencies {
     implementation(libs.androidx.compose.ui.text.google.fonts)
     ksp(libs.room.compiler)
     ksp(libs.hilt.android.compiler)
+    ksp(libs.androidx.hilt.compiler)
     implementation(libs.play.services.location)
     implementation(libs.bundles.coil)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.appcompat)
 
     implementation(libs.mapbox)
-
     implementation(libs.mapbox.compose) {
         exclude(group = "com.mapbox.common", module = "common")
     }
-
     implementation(libs.mapbox.search) {
         exclude(group = "com.mapbox.common", module = "common")
     }
-
     implementation(libs.mapbox.search.ui) {
         exclude(group = "com.mapbox.common", module = "common")
     }
+
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

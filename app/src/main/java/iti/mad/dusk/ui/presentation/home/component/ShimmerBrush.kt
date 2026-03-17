@@ -1,4 +1,4 @@
-package iti.mad.dusk.ui.components
+package iti.mad.dusk.ui.presentation.home.component
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 
 @Composable
 fun shimmerBrush(): Brush {

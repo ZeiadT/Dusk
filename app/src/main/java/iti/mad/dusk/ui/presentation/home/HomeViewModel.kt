@@ -11,6 +11,7 @@ import iti.mad.dusk.domain.exception.WeatherException
 import iti.mad.dusk.domain.model.CurrentWeather
 import iti.mad.dusk.domain.model.Forecast
 import iti.mad.dusk.domain.repo.LocationRepository
+import iti.mad.dusk.domain.repo.SettingsRepository
 import iti.mad.dusk.domain.repo.WeatherRepository
 import iti.mad.dusk.ui.presentation.home.model.HomeUiState
 import iti.mad.dusk.ui.presentation.home.model.LocationEvent
@@ -31,12 +32,13 @@ class HomeViewModel @Inject constructor(
     private val weatherRepository: WeatherRepository,
     private val locationRepository: LocationRepository,
     private val locationManager: LocationManager,
+    private val settingsRepository: SettingsRepository,
 ) : ViewModel() {
 
     private var weatherJob: Job? = null
     private var lastKnownLocation: Pair<Double, Double>? = null
         set(value) {
-            if(value == null) {
+            if (value == null) {
                 field = null
                 return
             }
@@ -65,15 +67,17 @@ class HomeViewModel @Inject constructor(
         _forecastException,
         _weatherLoading,
         _forecastLoading,
-        _isInitialized
-    ) { weather, forecast, weatherError, forecastError, weatherLoading, forecastLoading, initialized ->
+        _isInitialized,
+        settingsRepository.getSettings(),
+    ) { weather, forecast, weatherError, forecastError, weatherLoading, forecastLoading, initialized, settings ->
         HomeUiState(
             currentWeather = weather,
             forecast = forecast,
             weatherException = weatherError,
             forecastException = forecastError,
             isRefreshing = weatherLoading || forecastLoading,
-            isInitialized = initialized
+            isInitialized = initialized,
+            settings = settings
         )
     }.stateIn(
         scope = viewModelScope,
@@ -95,7 +99,7 @@ class HomeViewModel @Inject constructor(
                     }
 
                     Log.d("TAG", "Requesting permission")
-                    if(location != null) lastKnownLocation = location.lat to location.lon
+                    if (location != null) lastKnownLocation = location.lat to location.lon
                     _locationEvents.send(LocationEvent.RequestPermissions)
                     return@collect
                 }

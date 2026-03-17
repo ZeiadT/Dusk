@@ -7,6 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import iti.mad.dusk.data.local.DuskDatabase
+import iti.mad.dusk.data.local.dao.AlertDao
 import iti.mad.dusk.data.local.dao.ForecastDao
 import iti.mad.dusk.data.local.dao.CurrentWeatherDao
 import iti.mad.dusk.data.local.dao.LocationDao
@@ -37,4 +38,9 @@ object DatabaseModule {
     @Singleton
     fun provideLocationDao(duskDatabase: DuskDatabase): LocationDao =
         duskDatabase.locationDao()
+
+    @Provides
+    @Singleton
+    fun provideAlertDao(duskDatabase: DuskDatabase): AlertDao =
+        duskDatabase.alertDao()
 }

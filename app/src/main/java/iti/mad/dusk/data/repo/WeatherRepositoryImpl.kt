@@ -13,6 +13,7 @@ import iti.mad.dusk.data.remote.datasource.WeatherRemoteDataSource
 import iti.mad.dusk.domain.exception.WeatherException
 import iti.mad.dusk.domain.model.CurrentWeather
 import iti.mad.dusk.domain.model.Forecast
+import iti.mad.dusk.domain.repo.SettingsRepository
 import iti.mad.dusk.domain.repo.WeatherRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +26,8 @@ import javax.inject.Inject
 class WeatherRepositoryImpl @Inject constructor(
     private val remoteDataSource: WeatherRemoteDataSource,
     private val localWeatherDataSource: WeatherLocalDataSource,
-    private val localForecastDataSource: ForecastLocalDataSource
+    private val localForecastDataSource: ForecastLocalDataSource,
+    private val settingsRepository: SettingsRepository,
 ) : WeatherRepository {
 
     override fun getCurrentWeather(
@@ -33,27 +35,29 @@ class WeatherRepositoryImpl @Inject constructor(
     ): Flow<Resource<CurrentWeather>> {
         var consumedForceFresh = forceFresh
 
-        return localWeatherDataSource.getCachedWeather(lat, lon).flatMapLatest { cached ->
-            val domain = cached?.weather?.toDomain(cached.conditions)
+        return settingsRepository.getSettings().flatMapLatest { settings ->
+            localWeatherDataSource.getCachedWeather(lat, lon).flatMapLatest { cached ->
+                val domain = cached?.weather?.toDomain(cached.conditions, settings)
 
-            when {
-                !consumedForceFresh && domain != null && cached.weather.isFresh() -> flowOf(
-                    Resource.Success(
-                        domain
+                when {
+                    !consumedForceFresh && domain != null && cached.weather.isFresh() -> flowOf(
+                        Resource.Success(domain)
                     )
-                )
 
-                else -> flow {
-                    if (domain != null) emit(Resource.Success(domain))
-                    emit(Resource.Loading)
+                    else -> flow {
+                        if (domain != null) emit(Resource.Success(domain))
+                        emit(Resource.Loading)
 
-                    remoteDataSource.getCurrentWeather(lat, lon, language).onSuccess { dto ->
-                        consumedForceFresh = false
-                        val entity = dto.toEntity(lat, lon)
-                        val conditions = dto.toConditionEntities(lat, lon)
-                        localWeatherDataSource.insertCache(entity, conditions)
-                    }.onFailure { throwable ->
-                        emit(Resource.Failure(throwable as WeatherException))
+                        remoteDataSource.getCurrentWeather(lat, lon, language)
+                            .onSuccess { dto ->
+                                consumedForceFresh = false
+                                val entity = dto.toEntity(lat, lon)
+                                val conditions = dto.toConditionEntities(lat, lon)
+                                localWeatherDataSource.insertCache(entity, conditions)
+                            }
+                            .onFailure { throwable ->
+                                emit(Resource.Failure(throwable as WeatherException))
+                            }
                     }
                 }
             }
@@ -65,28 +69,30 @@ class WeatherRepositoryImpl @Inject constructor(
     ): Flow<Resource<Forecast>> {
         var consumedForceFresh = forceFresh
 
-        return localForecastDataSource.getForecast(lat, lon).flatMapLatest { cached ->
-            val domain = cached?.forecast?.toDomain(cached.items)
+        return settingsRepository.getSettings().flatMapLatest { settings ->
+            localForecastDataSource.getForecast(lat, lon).flatMapLatest { cached ->
+                val domain = cached?.forecast?.toDomain(cached.items, settings)
 
-            when {
-                !consumedForceFresh && domain != null && cached.forecast.isFresh() -> flowOf(
-                    Resource.Success(
-                        domain
+                when {
+                    !consumedForceFresh && domain != null && cached.forecast.isFresh() -> flowOf(
+                        Resource.Success(domain)
                     )
-                )
 
-                else -> flow {
-                    if (domain != null) emit(Resource.Success(domain))
-                    emit(Resource.Loading)
+                    else -> flow {
+                        if (domain != null) emit(Resource.Success(domain))
+                        emit(Resource.Loading)
 
-                    remoteDataSource.getForecast(lat, lon, language).onSuccess { dto ->
-                        consumedForceFresh = false
-                        val cache = dto.toCacheEntity(lat, lon)
-                        val items = dto.toItemEntities(lat, lon)
-                        val conditions = dto.toConditionEntities(lat, lon)
-                        localForecastDataSource.insertCache(cache, items, conditions)
-                    }.onFailure { throwable ->
-                        emit(Resource.Failure(throwable as WeatherException))
+                        remoteDataSource.getForecast(lat, lon, language)
+                            .onSuccess { dto ->
+                                consumedForceFresh = false
+                                val cache = dto.toCacheEntity(lat, lon)
+                                val items = dto.toItemEntities(lat, lon)
+                                val conditions = dto.toConditionEntities(lat, lon)
+                                localForecastDataSource.insertCache(cache, items, conditions)
+                            }
+                            .onFailure { throwable ->
+                                emit(Resource.Failure(throwable as WeatherException))
+                            }
                     }
                 }
             }

@@ -14,26 +14,32 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.res.stringResource
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import iti.mad.dusk.ui.presentation.main.MainViewModel
 
 @Composable
 fun DuskBottomNavBar(
+    modifier: Modifier = Modifier,
     navController: NavHostController,
-    modifier: Modifier = Modifier
+    mainViewModel: MainViewModel = hiltViewModel(),
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
     NavigationBar(
         modifier = modifier.fillMaxWidth(),
-//        containerColor = ,
-//        contentColor =
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+        contentColor = MaterialTheme.colorScheme.onSurface
     ) {
         bottomNavItems.forEach { navItem ->
+            val label = stringResource(navItem.labelRes)
+
             val isSelected = currentDestination?.hierarchy?.any {
                 it.hasRoute(navItem.screen::class)
             } == true
@@ -44,7 +50,7 @@ fun DuskBottomNavBar(
                     dampingRatio = Spring.DampingRatioMediumBouncy,
                     stiffness = Spring.StiffnessLow
                 ),
-                label = "NavItemScale_${navItem.label}"
+                label = "NavItemScale_${navItem.labelRes}"
             )
 
             NavigationBarItem(
@@ -57,27 +63,30 @@ fun DuskBottomNavBar(
                         launchSingleTop = true
                         restoreState = true
                     }
+                    if (navItem.screen is Screen.Home) {
+                        mainViewModel.onHomeNavigation()
+                    }
                 },
                 icon = {
                     Icon(
                         imageVector = if (isSelected) navItem.selectedIcon else navItem.unselectedIcon,
-                        contentDescription = navItem.label,
+                        contentDescription = label,
                         modifier = Modifier.scale(scale)
                     )
                 },
                 label = {
                     Text(
-                        text = navItem.label,
+                        text = label,
                         style = MaterialTheme.typography.labelSmall
                     )
                 },
-//                colors = NavigationBarItemDefaults.colors(
-//                    selectedIconColor = ,
-//                    selectedTextColor = ,
-//                    unselectedIconColor = ,
-//                    unselectedTextColor = ,
-//                    indicatorColor =
-//                )
+                colors = NavigationBarItemDefaults.colors(
+                    selectedIconColor = MaterialTheme.colorScheme.onPrimary,
+                    selectedTextColor = MaterialTheme.colorScheme.primary,
+                    unselectedIconColor = MaterialTheme.colorScheme.secondary,
+                    unselectedTextColor = MaterialTheme.colorScheme.secondary,
+                    indicatorColor = MaterialTheme.colorScheme.primary
+                )
             )
         }
     }

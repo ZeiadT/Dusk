@@ -1,8 +1,6 @@
-package iti.mad.dusk.ui.presentation.home
+package iti.mad.dusk.ui.presentation.home.component
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +13,8 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import iti.mad.dusk.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,14 +24,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import iti.mad.dusk.domain.model.DailyForecast
+import iti.mad.dusk.domain.model.WeatherSettings
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.math.roundToInt
 
 @Composable
 fun DailyForecastCard(
+    modifier: Modifier = Modifier,
     daily: List<DailyForecast>,
-    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
@@ -41,7 +42,7 @@ fun DailyForecastCard(
             .padding(20.dp)
     ) {
         Text(
-            "5-DAY FORECAST",
+            stringResource(R.string.home_section_5day),
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -91,14 +92,14 @@ private fun DailyRow(day: DailyForecast) {
         )
         if (day.precipitationProbability > 0.1f) {
             Text(
-                "${(day.precipitationProbability * 100).roundToInt()}%",
+                stringResource(R.string.home_percent_format, (day.precipitationProbability * 100).roundToInt()),
                 color    = MaterialTheme.colorScheme.secondary,
                 fontSize = 11.sp,
                 modifier = Modifier.padding(end = 12.dp)
             )
         }
         Text(
-            "${day.tempMin.roundToInt()}°",
+            stringResource(R.string.home_temp_format, day.tempMin.roundToInt()),
             color      = MaterialTheme.colorScheme.secondary,
             fontSize   = 13.sp,
             fontWeight = FontWeight.Medium,
@@ -106,12 +107,12 @@ private fun DailyRow(day: DailyForecast) {
             textAlign  = TextAlign.End
         )
         Text(
-            " / ",
+            stringResource(R.string.home_daily_separator),
             color    = MaterialTheme.colorScheme.outlineVariant,
             fontSize = 13.sp
         )
         Text(
-            "${day.tempMax.roundToInt()}°",
+            stringResource(R.string.home_temp_format, day.tempMax.roundToInt()),
             color      = MaterialTheme.colorScheme.primary,
             fontSize   = 13.sp,
             fontWeight = FontWeight.SemiBold,

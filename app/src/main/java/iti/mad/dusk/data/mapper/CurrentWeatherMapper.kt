@@ -1,5 +1,6 @@
 package iti.mad.dusk.data.mapper
 
+import iti.mad.dusk.core.util.UnitConverter
 import iti.mad.dusk.core.util.extension.roundCoordinate
 import iti.mad.dusk.data.local.entity.CurrentWeatherCacheEntity
 import iti.mad.dusk.data.local.entity.CurrentWeatherConditionEntity
@@ -10,6 +11,7 @@ import iti.mad.dusk.domain.model.Precipitation
 import iti.mad.dusk.domain.model.SunCycle
 import iti.mad.dusk.domain.model.Temperature
 import iti.mad.dusk.domain.model.WeatherCondition
+import iti.mad.dusk.domain.model.WeatherSettings
 import iti.mad.dusk.domain.model.Wind
 
 // ── DTO → Entity ──────────────────────────────────────────────────────────────
@@ -76,7 +78,8 @@ fun CurrentWeatherResponseDto.toConditionEntities(
 // ── Entity → Domain ───────────────────────────────────────────────────────────
 
 fun CurrentWeatherCacheEntity.toDomain(
-    conditions: List<CurrentWeatherConditionEntity>
+    conditions: List<CurrentWeatherConditionEntity>,
+    weatherSettings: WeatherSettings,
 ): CurrentWeather {
     val primary = conditions.firstOrNull()
     return CurrentWeather(
@@ -96,35 +99,35 @@ fun CurrentWeatherCacheEntity.toDomain(
         ),
 
         temperature = Temperature(
-            current = temp ?: 0f,
-            feelsLike = feelsLike ?: 0f,
-            min = tempMin ?: 0f,
-            max = tempMax ?: 0f,
-            pressure = pressure ?: 1013,
-            humidity = humidity ?: 0
+            current   = UnitConverter.convertTemperature(temp      ?: 0f, weatherSettings.temperatureUnit),
+            feelsLike = UnitConverter.convertTemperature(feelsLike ?: 0f, weatherSettings.temperatureUnit),
+            min       = UnitConverter.convertTemperature(tempMin   ?: 0f, weatherSettings.temperatureUnit),
+            max       = UnitConverter.convertTemperature(tempMax   ?: 0f, weatherSettings.temperatureUnit),
+            pressure  = pressure ?: 1013,
+            humidity  = humidity ?: 0
         ),
 
         wind = Wind(
-            speed = windSpeed ?: 0f,
+            speed   = UnitConverter.convertWindSpeed(windSpeed ?: 0f, weatherSettings.windSpeedUnit),
             degrees = windDeg ?: 0,
-            gust = windGust ?: 0f
+            gust    = UnitConverter.convertWindSpeed(windGust  ?: 0f, weatherSettings.windSpeedUnit),
         ),
 
         cloudsInPercentage = cloudsAll ?: 0,
 
         rain = Precipitation(
-            oneHour = rain1h ?: 0f,
+            oneHour   = rain1h ?: 0f,
             threeHour = rain3h ?: 0f
         ),
 
         snow = Precipitation(
-            oneHour = snow1h ?: 0f,
+            oneHour   = snow1h ?: 0f,
             threeHour = snow3h ?: 0f
         ),
 
         sun = SunCycle(
             sunrise = sunrise ?: 0L,
-            sunset = sunset ?: 0L
+            sunset  = sunset  ?: 0L
         )
     )
 }

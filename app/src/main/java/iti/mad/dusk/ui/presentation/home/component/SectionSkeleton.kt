@@ -10,7 +10,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import iti.mad.dusk.ui.components.shimmerBrush
 
 @Composable
 fun SectionSkeleton(

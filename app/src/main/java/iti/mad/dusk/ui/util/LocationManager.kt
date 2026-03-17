@@ -16,6 +16,7 @@ import com.google.android.gms.location.LocationSettingsStatusCodes
 import com.google.android.gms.location.Priority
 import dagger.hilt.android.qualifiers.ApplicationContext
 import iti.mad.dusk.domain.exception.WeatherException
+import iti.mad.dusk.R
 import iti.mad.dusk.domain.model.Location
 import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
@@ -36,8 +37,7 @@ class LocationManager @Inject constructor(@param:ApplicationContext private val 
         val permissions = arrayOf(
             Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION
         )
-        private const val UNKNOWN_CITY = "Unknown City"
-        private const val UNKNOWN_COUNTRY = "Unknown Country"
+
     }
 
     sealed interface LocationResult {
@@ -48,30 +48,30 @@ class LocationManager @Inject constructor(@param:ApplicationContext private val 
     fun hasLocationPermission(): Boolean {
         permissions.forEach {
             if (ContextCompat.checkSelfPermission(
-                    context,
-                    it
+                    context, it
                 ) == PackageManager.PERMISSION_GRANTED
             ) return true
         }
         return false
     }
 
-    suspend fun checkGpsRequireResolution(): ResolvableApiException? = suspendCancellableCoroutine { cont ->
-        val request = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
-            .setAlwaysShow(true).build()
+    suspend fun checkGpsRequireResolution(): ResolvableApiException? =
+        suspendCancellableCoroutine { cont ->
+            val request = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+                .setAlwaysShow(true).build()
 
-        LocationServices.getSettingsClient(context).checkLocationSettings(request)
-            .addOnSuccessListener {
-                cont.resume(null)
-            }.addOnFailureListener { exception ->
-                val result = when ((exception as? ResolvableApiException)?.statusCode) {
-                    LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> exception
+            LocationServices.getSettingsClient(context).checkLocationSettings(request)
+                .addOnSuccessListener {
+                    cont.resume(null)
+                }.addOnFailureListener { exception ->
+                    val result = when ((exception as? ResolvableApiException)?.statusCode) {
+                        LocationSettingsStatusCodes.RESOLUTION_REQUIRED -> exception
 
-                    else -> null
+                        else -> null
+                    }
+                    cont.resume(result)
                 }
-                cont.resume(result)
-            }
-    }
+        }
 
     @SuppressLint("MissingPermission")
     suspend fun getCurrentLocation(): LocationResult = suspendCancellableCoroutine { cont ->
@@ -79,16 +79,15 @@ class LocationManager @Inject constructor(@param:ApplicationContext private val 
             .setDurationMillis(10_000L).setMaxUpdateAgeMillis(Long.MAX_VALUE).build()
 
         fusedLocationClient.getCurrentLocation(request, null).addOnSuccessListener { location ->
-                if (location != null) cont.resume(
-                    LocationResult.Success(
-                        location.latitude,
-                        location.longitude
-                    )
+            if (location != null) cont.resume(
+                LocationResult.Success(
+                    location.latitude, location.longitude
                 )
-                else cont.resume(LocationResult.Failure(WeatherException.LocationUnavailable()))
-            }.addOnFailureListener { exception ->
-                cont.resume(LocationResult.Failure(WeatherException.LocationUnavailable(exception.message)))
-            }
+            )
+            else cont.resume(LocationResult.Failure(WeatherException.LocationUnavailable()))
+        }.addOnFailureListener { exception ->
+            cont.resume(LocationResult.Failure(WeatherException.LocationUnavailable(exception.message)))
+        }
     }
 
     suspend fun buildLocation(
@@ -98,7 +97,10 @@ class LocationManager @Inject constructor(@param:ApplicationContext private val 
         isCurrent: Boolean = false,
     ): Location {
         val (cityName, country) = resolveAddress(lat, lon)
-        val displayName = if (cityName != UNKNOWN_CITY) cityName else "$lat, $lon"
+        val unknownCity = context.getString(R.string.location_unknown_city)
+        val displayName = if (cityName != unknownCity) cityName else context.getString(
+            R.string.location_display_name_fallback, lat, lon
+        )
 
         return Location(
             lat = lat,
@@ -113,13 +115,16 @@ class LocationManager @Inject constructor(@param:ApplicationContext private val 
     }
 
     private suspend fun resolveAddress(lat: Double, lon: Double): Pair<String, String> {
+        val unknownCity = context.getString(R.string.location_unknown_city)
+        val unknownCountry = context.getString(R.string.location_unknown_country)
+
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             suspendCancellableCoroutine { cont ->
                 geocoder.getFromLocation(lat, lon, 1) { addresses ->
                     val address = addresses.firstOrNull()
                     cont.resume(
                         (address?.locality ?: address?.subAdminArea
-                        ?: UNKNOWN_CITY) to (address?.countryName ?: UNKNOWN_COUNTRY)
+                        ?: unknownCity) to (address?.countryName ?: unknownCountry)
                     )
                 }
             }
@@ -132,9 +137,9 @@ class LocationManager @Inject constructor(@param:ApplicationContext private val 
                     1
                 )
             }.getOrNull()?.firstOrNull()?.let { address ->
-                    (address.locality ?: address.subAdminArea
-                    ?: UNKNOWN_CITY) to (address.countryName ?: UNKNOWN_COUNTRY)
-                } ?: (UNKNOWN_CITY to UNKNOWN_COUNTRY)
+                (address.locality ?: address.subAdminArea
+                ?: unknownCity) to (address.countryName ?: unknownCountry)
+            } ?: (unknownCity to unknownCountry)
         }
     }
 }

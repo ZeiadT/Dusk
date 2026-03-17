@@ -1,4 +1,4 @@
-package iti.mad.dusk.ui.presentation.home
+package iti.mad.dusk.ui.presentation.home.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,11 +12,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import iti.mad.dusk.ui.components.shimmerBrush
 
 @Composable
 fun HomeScreenShimmer(modifier: Modifier = Modifier) {
@@ -30,10 +31,8 @@ fun HomeScreenShimmer(modifier: Modifier = Modifier) {
     ) {
         Spacer(Modifier.height(16.dp))
 
-        // Location row
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
         ) {
             ShimmerBlock(width = 160.dp, height = 14.dp, brush = brush)
             ShimmerBlock(width = 72.dp, height = 22.dp, radius = 20.dp, brush = brush)
@@ -41,31 +40,25 @@ fun HomeScreenShimmer(modifier: Modifier = Modifier) {
 
         Spacer(Modifier.height(20.dp))
 
-        // Temperature
         ShimmerBlock(width = 180.dp, height = 80.dp, radius = 8.dp, brush = brush)
         Spacer(Modifier.height(10.dp))
 
-        // Condition
         ShimmerBlock(width = 120.dp, height = 16.dp, brush = brush)
         Spacer(Modifier.height(6.dp))
 
-        // Hi/Lo
         ShimmerBlock(width = 100.dp, height = 13.dp, brush = brush)
         Spacer(Modifier.height(28.dp))
 
-        // Divider
         ShimmerBlock(width = null, height = 1.dp, radius = 1.dp, brush = brush)
         Spacer(Modifier.height(22.dp))
 
-        // Stats row — 5 items
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
         ) {
             repeat(5) {
                 Column(
                     verticalArrangement = Arrangement.spacedBy(6.dp),
-                    horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     ShimmerBlock(width = 20.dp, height = 20.dp, radius = 10.dp, brush = brush)
                     ShimmerBlock(width = 36.dp, height = 13.dp, brush = brush)
@@ -76,22 +69,30 @@ fun HomeScreenShimmer(modifier: Modifier = Modifier) {
 
         Spacer(Modifier.height(28.dp))
 
-        // Toggle
         ShimmerBlock(width = null, height = 40.dp, radius = 12.dp, brush = brush)
         Spacer(Modifier.height(14.dp))
 
-        // Forecast strip
         ShimmerBlock(width = null, height = 120.dp, radius = 20.dp, brush = brush)
 
         Spacer(Modifier.height(24.dp))
 
-        // Buttons row
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            ShimmerBlock(width = null, height = 48.dp, radius = 12.dp, brush = brush, modifier = Modifier.weight(1f))
-            ShimmerBlock(width = null, height = 48.dp, radius = 12.dp, brush = brush, modifier = Modifier.weight(1f))
+            ShimmerBlock(
+                width = null,
+                height = 48.dp,
+                radius = 12.dp,
+                brush = brush,
+                modifier = Modifier.weight(1f)
+            )
+            ShimmerBlock(
+                width = null,
+                height = 48.dp,
+                radius = 12.dp,
+                brush = brush,
+                modifier = Modifier.weight(1f)
+            )
         }
     }
 }
@@ -99,7 +100,7 @@ fun HomeScreenShimmer(modifier: Modifier = Modifier) {
 @Composable
 private fun ShimmerBlock(
     height: Dp,
-    brush: androidx.compose.ui.graphics.Brush,
+    brush: Brush,
     modifier: Modifier = Modifier,
     width: Dp? = null,
     radius: Dp = 6.dp,

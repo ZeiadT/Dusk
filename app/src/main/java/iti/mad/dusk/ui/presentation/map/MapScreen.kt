@@ -23,6 +23,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import iti.mad.dusk.R
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -54,7 +56,10 @@ fun MapScreen(
 
     val mapViewportState = rememberMapViewportState()
 
-    LaunchedEffect(Unit) { mainViewModel.setBottomBar(false) }
+    LaunchedEffect(Unit) {
+        mainViewModel.setBottomBar(false)
+        mainViewModel.setFab(null)
+    }
     DisposableEffect(Unit) { onDispose { mainViewModel.setBottomBar(true) } }
 
     ObserveAsEvents(mapViewModel.navEvents) { event ->
@@ -95,7 +100,7 @@ fun MapScreen(
                     IconButton(onClick = { mapViewModel.onEvent(MapEvent.OnBack) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.map_back)
                         )
                     }
                 }
@@ -135,7 +140,7 @@ fun MapScreen(
                     .height(52.dp),
                 shape = MaterialTheme.shapes.medium,
             ) {
-                Text("Save location")
+                Text(stringResource(R.string.map_save_location))
             }
         }
     }

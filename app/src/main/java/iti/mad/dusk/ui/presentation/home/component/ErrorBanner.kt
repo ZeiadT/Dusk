@@ -22,6 +22,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import iti.mad.dusk.R
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -50,7 +52,6 @@ fun ErrorBanner(
             verticalAlignment     = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            // Red indicator icon — only this is red
             Icon(
                 imageVector        = Icons.Outlined.ErrorOutline,
                 contentDescription = null,
@@ -58,7 +59,6 @@ fun ErrorBanner(
                 modifier           = Modifier.size(16.dp)
             )
 
-            // Message — neutral text color
             Text(
                 text     = message ?: "",
                 style    = MaterialTheme.typography.bodySmall,
@@ -68,7 +68,6 @@ fun ErrorBanner(
                 modifier = Modifier.weight(1f)
             )
 
-            // Compact retry button — just text + icon, no container
             TextButton(
                 onClick      = onRetry,
                 contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 8.dp, vertical = 4.dp)
@@ -81,7 +80,7 @@ fun ErrorBanner(
                 )
                 Spacer(Modifier.width(3.dp))
                 Text(
-                    "Retry",
+                    stringResource(R.string.home_error_retry),
                     color      = MaterialTheme.colorScheme.primary,
                     fontSize   = 12.sp,
                     fontWeight = FontWeight.SemiBold
