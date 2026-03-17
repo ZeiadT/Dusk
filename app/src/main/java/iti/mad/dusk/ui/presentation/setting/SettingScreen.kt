@@ -29,7 +29,6 @@ import iti.mad.dusk.app.MainActivity
 import iti.mad.dusk.domain.model.Language
 import iti.mad.dusk.domain.model.TemperatureUnit
 import iti.mad.dusk.domain.model.WindSpeedUnit
-import iti.mad.dusk.ui.presentation.locations.LocationsViewModel
 import iti.mad.dusk.ui.presentation.main.MainViewModel
 
 @Composable
